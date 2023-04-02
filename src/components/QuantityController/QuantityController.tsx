@@ -41,7 +41,7 @@ export default function QuantityController({
   };
 
   const increase = () => {
-    let _value = Number(value || localValue ) + 1;
+    let _value = Number(value || localValue) + 1;
     if (max !== undefined && _value > max) {
       _value = max;
     }
