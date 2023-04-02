@@ -1,23 +1,23 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useMutation } from '@tanstack/react-query';
-import React, { useContext } from 'react';
-import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
-import authApi from 'src/apis/auth.api';
-import Button from 'src/components/Button';
-import Input from 'src/components/Input';
-import path from 'src/constants/path';
-import { AppContext } from 'src/contexts/app.context';
-import { ErrorResponse } from 'src/types/utils.type';
-import { Schema, schema } from 'src/utils/rules';
-import { axiosUnprocessableEntityError } from 'src/utils/utils';
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useMutation } from '@tanstack/react-query'
+import React, { useContext } from 'react'
+import { useForm } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
+import authApi from 'src/apis/auth.api'
+import Button from 'src/components/Button'
+import Input from 'src/components/Input'
+import path from 'src/constants/path'
+import { AppContext } from 'src/contexts/app.context'
+import { ErrorResponse } from 'src/types/utils.type'
+import { Schema, schema } from 'src/utils/rules'
+import { axiosUnprocessableEntityError } from 'src/utils/utils'
 
-type FormData = Pick<Schema, 'password' | 'email'>;
-const loginSchema = schema.pick(['password', 'email']);
+type FormData = Pick<Schema, 'password' | 'email'>
+const loginSchema = schema.pick(['password', 'email'])
 
 export default function Login() {
-  const { isAuthenticated, setIsAuthenticated, profile, setProfile } = useContext(AppContext);
-  const navigate = useNavigate();
+  const { isAuthenticated, setIsAuthenticated, profile, setProfile } = useContext(AppContext)
+  const navigate = useNavigate()
 
   const {
     handleSubmit,
@@ -26,36 +26,36 @@ export default function Login() {
     formState: { errors }
   } = useForm<FormData>({
     resolver: yupResolver(loginSchema)
-  });
+  })
 
   const loginAccountMutation = useMutation({
     mutationFn: (body: Omit<FormData, 'password_confirm'>) => authApi.loginAccount(body)
-  });
+  })
 
   const onSubmit = handleSubmit((data) => {
-    console.log('check data login: ', data);
+    console.log('check data login: ', data)
     loginAccountMutation.mutate(data, {
       onSuccess: (data) => {
-        setIsAuthenticated(true);
-        setProfile(data.data.data.user);
-        navigate('/');
+        setIsAuthenticated(true)
+        setProfile(data.data.data.user)
+        navigate('/')
       },
 
       onError: (error) => {
         if (axiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
-          const formError = error.response?.data.data;
+          const formError = error.response?.data.data
           if (formError) {
             Object.keys(formError).forEach((key) => {
               setError(key as keyof FormData, {
                 message: formError[key as keyof FormData],
                 type: 'Server'
-              });
-            });
+              })
+            })
           }
         }
       }
-    });
-  });
+    })
+  })
 
   return (
     <div className='bg-orange'>
@@ -108,5 +108,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  );
+  )
 }

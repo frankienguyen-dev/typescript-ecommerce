@@ -1,27 +1,21 @@
-import React, { useState, useRef, useId, ElementType } from 'react';
-import { Link } from 'react-router-dom';
-import { useFloating, FloatingPortal, arrow, shift, offset, Placement } from '@floating-ui/react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { render } from 'react-dom';
+import React, { useState, useRef, useId, ElementType } from 'react'
+import { Link } from 'react-router-dom'
+import { useFloating, FloatingPortal, arrow, shift, offset, Placement } from '@floating-ui/react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { render } from 'react-dom'
 
 interface Props {
-  children: React.ReactNode;
-  renderPopover: React.ReactNode;
-  className?: string;
-  as?: ElementType;
-  placement?: Placement;
+  children: React.ReactNode
+  renderPopover: React.ReactNode
+  className?: string
+  as?: ElementType
+  placement?: Placement
 }
 
-export default function Popover({
-  children,
-  renderPopover,
-  className,
-  as: Element = 'div',
-  placement
-}: Props) {
-  const [isOpen, setIsOpen] = useState(false);
-  const arrowRef = useRef<HTMLElement>(null);
-  const id = useId();
+export default function Popover({ children, renderPopover, className, as: Element = 'div', placement }: Props) {
+  const [isOpen, setIsOpen] = useState(false)
+  const arrowRef = useRef<HTMLElement>(null)
+  const id = useId()
   const { x, y, strategy, refs, middlewareData } = useFloating({
     middleware: [
       offset(6),
@@ -31,22 +25,17 @@ export default function Popover({
       })
     ],
     placement
-  });
+  })
 
   const showPopover = () => {
-    setIsOpen(true);
-  };
+    setIsOpen(true)
+  }
 
   const hidePopover = () => {
-    setIsOpen(false);
-  };
+    setIsOpen(false)
+  }
   return (
-    <Element
-      className={className}
-      ref={refs.setReference}
-      onMouseEnter={showPopover}
-      onMouseLeave={hidePopover}
-    >
+    <Element className={className} ref={refs.setReference} onMouseEnter={showPopover} onMouseLeave={hidePopover}>
       {children}
       <FloatingPortal id={id}>
         <AnimatePresence>
@@ -81,5 +70,5 @@ export default function Popover({
         </AnimatePresence>
       </FloatingPortal>
     </Element>
-  );
+  )
 }

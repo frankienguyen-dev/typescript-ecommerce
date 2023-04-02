@@ -3,9 +3,9 @@ export const sortBy = {
   view: 'view',
   sold: 'sold',
   price: 'price'
-} as const;
+} as const
 
 export const order = {
   desc: 'desc',
   asc: 'asc'
-} as const;
+} as const

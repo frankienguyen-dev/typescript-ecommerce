@@ -1,11 +1,11 @@
-import React from 'react';
-import { Link, useMatch } from 'react-router-dom';
-import path from 'src/constants/path';
+import React from 'react'
+import { Link, useMatch } from 'react-router-dom'
+import path from 'src/constants/path'
 
 export default function RegisterHeader() {
-  const registerMatch = useMatch('/register');
+  const registerMatch = useMatch('/register')
 
-  const isRegister = Boolean(registerMatch);
+  const isRegister = Boolean(registerMatch)
 
   return (
     <header className='py-4'>
@@ -26,5 +26,5 @@ export default function RegisterHeader() {
         </nav>
       </div>
     </header>
-  );
+  )
 }

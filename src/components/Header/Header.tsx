@@ -14,6 +14,7 @@ import { omit } from "lodash";
 import { purchasesStatus } from "src/constants/purchase";
 import purchaseApi from "src/apis/purchase.api";
 import { formatCurrency } from "src/utils/utils";
+import { Purchase } from "src/types/purchase.type";
 
 type FormData = Pick<Schema, "name">;
 const nameSchema = schema.pick(["name"]);
@@ -237,7 +238,7 @@ export default function Header() {
             <Popover
               placement="bottom-end"
               renderPopover={
-                <div className="relative max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md">
+                <div className="z-999 relative h-[400px] w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md">
                   {purchasesInCart ? (
                     <div className="p-2">
                       <div className="capitalize text-gray-400">
