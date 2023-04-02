@@ -1,27 +1,27 @@
-import { sortBy, order as orderContants } from 'src/constants/product';
+import { sortBy, order as orderContants } from 'src/constants/product'
 
-import classNames from 'classnames';
-import { productListConfig } from 'src/types/product.type';
-import { Link, createSearchParams, parsePath, useNavigate } from 'react-router-dom';
-import path from 'src/constants/path';
-import { omit } from 'lodash';
-import { spawn } from 'child_process';
-import { QueryConfig } from 'src/hooks/useQueryConfig';
+import classNames from 'classnames'
+import { productListConfig } from 'src/types/product.type'
+import { Link, createSearchParams, parsePath, useNavigate } from 'react-router-dom'
+import path from 'src/constants/path'
+import { omit } from 'lodash'
+import { spawn } from 'child_process'
+import { QueryConfig } from 'src/hooks/useQueryConfig'
 
 interface Props {
-  queryConfig: QueryConfig;
-  pageSize: number;
+  queryConfig: QueryConfig
+  pageSize: number
 }
 
 export default function SortProductList({ queryConfig, pageSize }: Props) {
-  const page = Number(queryConfig.page);
-  const { sort_by = sortBy.createdAt, order } = queryConfig;
+  const page = Number(queryConfig.page)
+  const { sort_by = sortBy.createdAt, order } = queryConfig
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const isActiveSortBy = (sortByValue: Exclude<productListConfig['sort_by'], undefined>) => {
-    return sort_by === sortByValue;
-  };
+    return sort_by === sortByValue
+  }
 
   const handleSort = (sortByValue: Exclude<productListConfig['sort_by'], undefined>) => {
     navigate({
@@ -35,8 +35,8 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
           ['order']
         )
       ).toString()
-    });
-  };
+    })
+  }
 
   const handlePriceOrder = (orderValue: Exclude<productListConfig['order'], undefined>) => {
     navigate({
@@ -46,8 +46,8 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
         order: orderValue,
         sort_by: sortBy.price
       }).toString()
-    });
-  };
+    })
+  }
 
   return (
     <div className='bg-gray-300/40 py-4 px-3'>
@@ -83,16 +83,11 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
           </button>
           <select
             value={order || ''}
-            onChange={(event) =>
-              handlePriceOrder(event.target.value as Exclude<productListConfig['order'], undefined>)
-            }
-            className={classNames(
-              'h-8 rounded-sm bg-white px-4 text-left text-sm capitalize  outline-none ',
-              {
-                'text-orange hover:bg-slate-100': isActiveSortBy(sortBy.price),
-                'text-black hover:bg-slate-100 ': !isActiveSortBy(sortBy.price)
-              }
-            )}
+            onChange={(event) => handlePriceOrder(event.target.value as Exclude<productListConfig['order'], undefined>)}
+            className={classNames('h-8 rounded-sm bg-white px-4 text-left text-sm capitalize  outline-none ', {
+              'text-orange hover:bg-slate-100': isActiveSortBy(sortBy.price),
+              'text-black hover:bg-slate-100 ': !isActiveSortBy(sortBy.price)
+            })}
           >
             <option value='' disabled>
               Giá
@@ -118,11 +113,7 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
                   stroke='currentColor'
                   className=' h-3 w-3 '
                 >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    d='M15.75 19.5L8.25 12l7.5-7.5'
-                  />
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 19.5L8.25 12l7.5-7.5' />
                 </svg>
               </span>
             ) : (
@@ -144,11 +135,7 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
                   stroke='currentColor'
                   className='h-3 w-3'
                 >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    d='M15.75 19.5L8.25 12l7.5-7.5'
-                  />
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 19.5L8.25 12l7.5-7.5' />
                 </svg>
               </Link>
             )}
@@ -163,11 +150,7 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
                   stroke='currentColor'
                   className='h-3 w-3'
                 >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    d='M8.25 4.5l7.5 7.5-7.5 7.5'
-                  />
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
                 </svg>
               </span>
             ) : (
@@ -189,11 +172,7 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
                   stroke='currentColor'
                   className='h-3 w-3'
                 >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    d='M8.25 4.5l7.5 7.5-7.5 7.5'
-                  />
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
                 </svg>
               </Link>
             )}
@@ -201,5 +180,5 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
         </div>
       </div>
     </div>
-  );
+  )
 }
