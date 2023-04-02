@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import InputNumber, { InputNumberProps } from "../InputNumber";
+import React, { useState } from 'react';
+import InputNumber, { InputNumberProps } from '../InputNumber';
 
 interface Props extends InputNumberProps {
   max?: number;
   onIncrease?: (value: number) => void;
   onDecrease?: (value: number) => void;
   onType?: (value: number) => void;
+  onFocusOut?: (value: number) => void;
   classNameWrapper?: string;
 }
 
@@ -14,7 +15,8 @@ export default function QuantityController({
   onIncrease,
   onDecrease,
   onType,
-  classNameWrapper = "ml-10",
+  onFocusOut,
+  classNameWrapper = 'ml-10',
   value,
   ...rest
 }: Props) {
@@ -33,11 +35,15 @@ export default function QuantityController({
 
   const decrease = () => {
     let _value = Number(value || localValue) - 1;
+    const min = 1;
     if (_value < 1) {
       _value = 1;
     }
-    onDecrease && onDecrease(_value);
-    setLocalValue(_value);
+
+    if (_value !== Number(value)) {
+      onDecrease && onDecrease(_value);
+      setLocalValue(_value);
+    }
   };
 
   const increase = () => {
@@ -45,13 +51,18 @@ export default function QuantityController({
     if (max !== undefined && _value > max) {
       _value = max;
     }
+    if (_value !== Number(value)) {
+      onIncrease && onIncrease(_value);
+      setLocalValue(_value);
+    }
+  };
 
-    onIncrease && onIncrease(_value);
-    setLocalValue(_value);
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
+    onFocusOut && onFocusOut(Number(event.target.value));
   };
 
   return (
-    <div className={" flex items-center " + classNameWrapper}>
+    <div className={' flex items-center ' + classNameWrapper}>
       <button
         className="flex h-8 w-8 items-center justify-center rounded-l-sm border
                    border-gray-300 text-black"
@@ -75,6 +86,7 @@ export default function QuantityController({
         classNameError="hidden"
         onChange={handleChange}
         value={value || localValue}
+        onBlur={handleBlur}
         {...rest}
       />
 
@@ -91,11 +103,7 @@ export default function QuantityController({
           stroke="currentColor"
           className="h-3 w-3 "
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 4.5v15m7.5-7.5h-15"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
       </button>
     </div>
