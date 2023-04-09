@@ -1,30 +1,31 @@
-import React, { useContext } from 'react'
-import { useRoutes, Outlet, Navigate } from 'react-router-dom'
-import path from 'src/constants/path'
-import { AppContext } from 'src/contexts/app.context'
-import MainLayout from 'src/layouts/MainLayout'
-import RegisterLayout from 'src/layouts/RegisterLayout'
-import Cart from 'src/pages/Cart'
-import Login from 'src/pages/Login'
-import ProductDetail from 'src/pages/ProductDetail'
-import ProductList from 'src/pages/ProductList'
-import Profile from 'src/pages/Profile'
-import Register from 'src/pages/Register'
+import React, { useContext } from "react";
+import { useRoutes, Outlet, Navigate } from "react-router-dom";
+import path from "src/constants/path";
+import { AppContext } from "src/contexts/app.context";
+import CartLayout from "src/layouts/CartLayout";
+import MainLayout from "src/layouts/MainLayout";
+import RegisterLayout from "src/layouts/RegisterLayout";
+import Cart from "src/pages/Cart";
+import Login from "src/pages/Login";
+import ProductDetail from "src/pages/ProductDetail";
+import ProductList from "src/pages/ProductList";
+import Profile from "src/pages/Profile";
+import Register from "src/pages/Register";
 
 function ProtectedRoute() {
-  const { isAuthenticated } = useContext(AppContext)
-  return isAuthenticated ? <Outlet /> : <Navigate to={path.login} />
+  const { isAuthenticated } = useContext(AppContext);
+  return isAuthenticated ? <Outlet /> : <Navigate to={path.login} />;
 }
 
 function RejectedRoute() {
-  const { isAuthenticated } = useContext(AppContext)
-  return !isAuthenticated ? <Outlet /> : <Navigate to={path.home} />
+  const { isAuthenticated } = useContext(AppContext);
+  return !isAuthenticated ? <Outlet /> : <Navigate to={path.home} />;
 }
 
 export default function useRouteElement() {
   const routeElements = useRoutes([
     {
-      path: '',
+      path: "",
       element: <ProtectedRoute />,
       children: [
         {
@@ -33,22 +34,22 @@ export default function useRouteElement() {
             <MainLayout>
               <Profile />
             </MainLayout>
-          )
+          ),
         },
 
         {
           path: path.cart,
           element: (
-            <MainLayout>
+            <CartLayout>
               <Cart />
-            </MainLayout>
-          )
-        }
-      ]
+            </CartLayout>
+          ),
+        },
+      ],
     },
 
     {
-      path: '',
+      path: "",
       element: <RejectedRoute />,
       children: [
         {
@@ -57,7 +58,7 @@ export default function useRouteElement() {
             <RegisterLayout>
               <Login />
             </RegisterLayout>
-          )
+          ),
         },
 
         {
@@ -66,9 +67,9 @@ export default function useRouteElement() {
             <RegisterLayout>
               <Register />
             </RegisterLayout>
-          )
-        }
-      ]
+          ),
+        },
+      ],
     },
     {
       path: path.home,
@@ -77,7 +78,7 @@ export default function useRouteElement() {
         <MainLayout>
           <ProductList />
         </MainLayout>
-      )
+      ),
     },
     {
       path: path.productDetail,
@@ -85,8 +86,8 @@ export default function useRouteElement() {
         <MainLayout>
           <ProductDetail />
         </MainLayout>
-      )
-    }
-  ])
-  return routeElements
+      ),
+    },
+  ]);
+  return routeElements;
 }
