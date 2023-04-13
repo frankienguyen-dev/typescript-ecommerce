@@ -1,30 +1,26 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import produce, { current } from "immer";
 import { extend, keyBy, result } from "lodash";
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import purchaseApi from "src/apis/purchase.api";
 import Button from "src/components/Button";
 import QuantityController from "src/components/QuantityController";
 import path from "src/constants/path";
 import { purchasesStatus } from "src/constants/purchase";
+import { AppContext } from "src/contexts/app.context";
 import { Purchase } from "src/types/purchase.type";
 import { formatCurrency, generateNameId } from "src/utils/utils";
 
-interface ExtendedPurchase extends Purchase {
-  disabled: boolean;
-  checked: boolean;
-}
-
 export default function Cart() {
-  const [extendedPurchase, setExtendedPurchase] = useState<ExtendedPurchase[]>(
-    []
-  );
+  const { isAuthenticated, extendedPurchase, setExtendedPurchase } =
+    useContext(AppContext);
 
   const { data: purchasesInCartData, refetch } = useQuery({
     queryKey: ["purchases", { status: purchasesStatus.inCart }],
     queryFn: () => purchaseApi.getPurchase({ status: purchasesStatus.inCart }),
+    enabled: isAuthenticated,
   });
 
   const updatePurchaseMutation = useMutation({
@@ -55,17 +51,22 @@ export default function Cart() {
   });
 
   const purchasesInCart = purchasesInCartData?.data.data;
-  const isAllChecked = extendedPurchase.every((purchase) => purchase.checked);
-  const checkedPurchases = extendedPurchase.filter(
-    (purchase) => purchase.checked
+  const isAllChecked = useMemo(
+    () => extendedPurchase.every((purchase) => purchase.checked),
+    [extendedPurchase]
+  );
+  const checkedPurchases = useMemo(
+    () => extendedPurchase.filter((purchase) => purchase.checked),
+    [extendedPurchase]
   );
   const checkedPurchasesCount = checkedPurchases.length;
 
-  const totalPriceCheckedPurchases = checkedPurchases.reduce(
-    (result, current) => {
-      return (result + current.product.price) * current.buy_count;
-    },
-    0
+  const totalPriceCheckedPurchases = useMemo(
+    () =>
+      checkedPurchases.reduce((result, current) => {
+        return (result + current.product.price) * current.buy_count;
+      }, 0),
+    [checkedPurchases]
   );
 
   const totalDiscountPriceCheckedPurchases = checkedPurchases.reduce(
@@ -80,18 +81,37 @@ export default function Cart() {
     0
   );
 
+  const location = useLocation();
+  const choosenPurchaseIdFromLocation = (
+    location.state as {
+      purchaseId: string;
+    } | null
+  )?.purchaseId;
+
   useEffect(() => {
     setExtendedPurchase((prev) => {
-      const extendedPurchaseObject = keyBy(prev, "_id");
+      const extendedPurchasesObject = keyBy(prev, "_id");
       return (
-        purchasesInCart?.map((purchase) => ({
-          ...purchase,
-          disabled: false,
-          checked: Boolean(extendedPurchaseObject[purchase._id]?.checked),
-        })) || []
+        purchasesInCart?.map((purchase) => {
+          const isChoosenPurchaseFromLocation =
+            choosenPurchaseIdFromLocation === purchase._id;
+          return {
+            ...purchase,
+            disabled: false,
+            checked:
+              isChoosenPurchaseFromLocation ||
+              Boolean(extendedPurchasesObject[purchase._id]?.checked),
+          };
+        }) || []
       );
     });
-  }, [purchasesInCart]);
+  }, [purchasesInCart, choosenPurchaseIdFromLocation]);
+
+  useEffect(() => {
+    return () => {
+      history.replaceState(null, "");
+    };
+  });
 
   const handleCheck =
     (purchaseIndex: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -378,8 +398,8 @@ export default function Cart() {
         )}
 
         {!(extendedPurchase.length > 0) && (
-          <div>
-            <div className="flex items-center justify-center pt-10">
+          <div className="py-20">
+            <div className=" flex items-center justify-center pt-10">
               <img
                 className="h-36 w-36"
                 src="src/images/no-product.png"
