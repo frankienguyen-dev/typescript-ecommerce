@@ -11,6 +11,8 @@ import ProductDetail from "src/pages/ProductDetail";
 import ProductList from "src/pages/ProductList";
 import Profile from "src/pages/Profile";
 import Register from "src/pages/Register";
+import UserLayout from "src/pages/User/layouts/UserLayout";
+import ChangePassword from "src/pages/User/pages/ChangePassword";
 
 function ProtectedRoute() {
   const { isAuthenticated } = useContext(AppContext);
@@ -22,8 +24,6 @@ function RejectedRoute() {
   return !isAuthenticated ? <Outlet /> : <Navigate to={path.home} />;
 }
 
-
-
 export default function useRouteElement() {
   const routeElements = useRoutes([
     {
@@ -31,21 +31,32 @@ export default function useRouteElement() {
       element: <ProtectedRoute />,
       children: [
         {
-          path: path.profile,
-          element: (
-            <MainLayout>
-              <Profile />
-            </MainLayout>
-          ),
-        },
-
-        {
           path: path.cart,
           element: (
             <CartLayout>
               <Cart />
             </CartLayout>
           ),
+        },
+
+        {
+          path: path.user,
+          element: (
+            <MainLayout>
+              <UserLayout />
+            </MainLayout>
+          ),
+          children: [
+            {
+              path: path.profile,
+              element: <Profile />,
+            },
+
+            {
+              path: path.changePassword,
+              element: <ChangePassword />,
+            },
+          ],
         },
       ],
     },
