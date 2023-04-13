@@ -22,6 +22,8 @@ function RejectedRoute() {
   return !isAuthenticated ? <Outlet /> : <Navigate to={path.home} />;
 }
 
+
+
 export default function useRouteElement() {
   const routeElements = useRoutes([
     {
