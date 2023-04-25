@@ -1,5 +1,6 @@
+import classNames from "classnames";
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import path from "src/constants/path";
 import { AppContext } from "src/contexts/app.context";
 import { getAvatarUrl } from "src/utils/utils";
@@ -47,9 +48,14 @@ export default function UserSideNav() {
       </div>
 
       <div className="mt-7">
-        <Link
+        <NavLink
           to={path.profile}
-          className="flex items-center capitalize text-orange transition-colors"
+          className={({ isActive }) =>
+            classNames("flex items-center capitalize transition-colors", {
+              "text-orange": isActive,
+              "text-gray-600": !isActive,
+            })
+          }
         >
           <div className="mr-3 h-[22px] w-[22px]">
             <img
@@ -58,11 +64,16 @@ export default function UserSideNav() {
             />
           </div>
           Tài khoản của tôi
-        </Link>
+        </NavLink>
 
-        <Link
+        <NavLink
           to={path.changePassword}
-          className="mt-4 flex items-center capitalize text-gray-600 transition-colors"
+          className={({ isActive }) =>
+            classNames("flex items-center mt-4 capitalize transition-colors", {
+              "text-orange": isActive,
+              "text-gray-600": !isActive,
+            })
+          }
         >
           <div className="mr-3 h-[22px] w-[22px]">
             <img
@@ -71,11 +82,16 @@ export default function UserSideNav() {
             />
           </div>
           Đổi mật khẩu
-        </Link>
+        </NavLink>
 
-        <Link
+        <NavLink
           to={path.historyPurchase}
-          className="mt-4 flex items-center capitalize text-gray-600 transition-colors"
+          className={({ isActive }) =>
+            classNames("mt-4 flex items-center capitalize transition-colors", {
+              "text-orange": isActive,
+              "text-gray-600": !isActive,
+            })
+          }
         >
           <div className="mr-3 h-[22px] w-[22px]">
             <img
@@ -84,7 +100,7 @@ export default function UserSideNav() {
             />
           </div>
           Đơn mua
-        </Link>
+        </NavLink>
       </div>
     </div>
   );
