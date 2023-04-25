@@ -111,7 +111,7 @@ export default function NavHeader() {
         >
           <div className="mr-2 h-6 w-6 flex-shrink-0">
             <img
-              src="https://cf.shopee.vn/file/sg-11134004-23030-h944s18hilovdf_tn"
+              src={profile?.avatar}
               alt="avatar"
               className="h-full w-full rounded-full object-cover"
             />
