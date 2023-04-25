@@ -120,9 +120,16 @@ export default function Profile() {
       }
     }
   });
-
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileFromLocal = event.target.files?.[0];
+    if (
+      fileFromLocal &&
+      (fileFromLocal.size >= 1048576 || !fileFromLocal.type.includes("image"))
+    ) {
+      toast.error("Dụng lượng file tối đa 1 MB. Định dạng:.JPEG, .PNG", {
+        autoClose: 1000,
+      });
+    }
     setFile(fileFromLocal);
   };
 
@@ -249,6 +256,9 @@ export default function Profile() {
               accept=".jpg,.jpeg,.png"
               ref={fileInputRef}
               onChange={onFileChange}
+              onClick={(event) => {
+                (event.target as any).value = null;
+              }}
             />
             <button
               className="flex h-10 items-center justify-end rounded-sm border 
