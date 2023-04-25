@@ -12,6 +12,7 @@ import { AppContext, AppProvider } from "src/contexts/app.context";
 import { setProfileToLocalStorage } from "src/utils/auth";
 import { axiosUnprocessableEntityError, getAvatarUrl } from "src/utils/utils";
 import { ErrorResponse } from "src/types/utils.type";
+import InputFile from "src/components/InputFile";
 
 type FormData = Pick<
   UserSchema,
@@ -120,21 +121,9 @@ export default function Profile() {
       }
     }
   });
-  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const fileFromLocal = event.target.files?.[0];
-    if (
-      fileFromLocal &&
-      (fileFromLocal.size >= 1048576 || !fileFromLocal.type.includes("image"))
-    ) {
-      toast.error("Dụng lượng file tối đa 1 MB. Định dạng:.JPEG, .PNG", {
-        autoClose: 1000,
-      });
-    }
-    setFile(fileFromLocal);
-  };
 
-  const handleUpload = () => {
-    fileInputRef.current?.click();
+  const handleChangeFile = (file?: File) => {
+    setFile(file);
   };
 
   return (
@@ -250,24 +239,7 @@ export default function Profile() {
                 className="h-full w-full rounded-full object-cover"
               />
             </div>
-            <input
-              className="hidden"
-              type="file"
-              accept=".jpg,.jpeg,.png"
-              ref={fileInputRef}
-              onChange={onFileChange}
-              onClick={(event) => {
-                (event.target as any).value = null;
-              }}
-            />
-            <button
-              className="flex h-10 items-center justify-end rounded-sm border 
-            bg-white px-6 text-sm text-gray-600 shadow-sm"
-              type="button"
-              onClick={handleUpload}
-            >
-              Chọn Ảnh
-            </button>
+            <InputFile onChange={handleChangeFile} />
 
             <div className="mt-3 text-gray-400">
               <div>Dụng lượng file tối đa 1 MB</div>
