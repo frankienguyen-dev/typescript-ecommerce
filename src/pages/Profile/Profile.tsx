@@ -1,12 +1,15 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import userApi from "src/apis/user.api";
 import Input from "src/components/Input";
 import InputNumber from "src/components/InputNumber";
 import { UserSchema, userSchema } from "src/utils/rules";
 import DateSelect from "../User/components/DateSelect";
+import { toast } from "react-toastify";
+import { AppContext, AppProvider } from "src/contexts/app.context";
+import { setProfileToLocalStorage } from "src/utils/auth";
 
 type FormData = Pick<
   UserSchema,
@@ -22,6 +25,8 @@ const profileSchema = userSchema.pick([
 ]);
 
 export default function Profile() {
+  const { setProfile } = useContext(AppContext);
+
   const {
     register,
     handleSubmit,
@@ -43,7 +48,7 @@ export default function Profile() {
 
   const updateProfileMutation = useMutation(userApi.updateProfile);
 
-  const { data: profileData } = useQuery({
+  const { data: profileData, refetch } = useQuery({
     queryKey: ["profiles"],
     queryFn: userApi.getProfile,
   });
@@ -67,9 +72,14 @@ export default function Profile() {
 
   const onSubmit = handleSubmit(async (data) => {
     console.log("check data: ", data);
-    // await updateProfileMutation.mutateAsync({
-
-    // })
+    const res = await updateProfileMutation.mutateAsync({
+      ...data,
+      date_of_birth: data.date_of_birth?.toISOString(),
+    });
+    setProfile(res.data.data);
+    setProfileToLocalStorage(res.data.data);
+    refetch();
+    toast.success(res.data.message, { autoClose: 1000 });
   });
 
   return (

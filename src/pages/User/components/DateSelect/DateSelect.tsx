@@ -1,5 +1,5 @@
 import { range } from "lodash";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Props {
   onChange?: (value: Date) => void;
@@ -14,11 +14,23 @@ export default function DateSelect({ onChange, value, errorMessage }: Props) {
     year: value?.getFullYear() || 1990,
   });
 
+  useEffect(() => {
+    if (value) {
+      setDate({
+        date: value?.getDate(),
+        month: value?.getMonth(),
+        year: value?.getFullYear(),
+      });
+    }
+  }, [value]);
+
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = event.target;
+    const { name, value: valueFromSelect } = event.target;
     const newDate = {
-      ...date,
-      [name]: value,
+      date: value?.getDate() || date.date,
+      month: value?.getMonth() || date.month,
+      year: value?.getFullYear() || date.year,
+      [name]: Number(valueFromSelect),
     };
     setDate(newDate);
     if (onChange) {
@@ -31,7 +43,7 @@ export default function DateSelect({ onChange, value, errorMessage }: Props) {
       <div className="w-full truncate pt-3 capitalize sm:w-[20%] sm:text-right">
         Ngày sinh:
       </div>
-      <div className="mt-3 w-full sm:mt-0 sm:w-[80%] sm:pl-5">  
+      <div className="mt-3 w-full sm:mt-0 sm:w-[80%] sm:pl-5">
         <div className="flex justify-between gap-5">
           <select
             onChange={handleChange}
