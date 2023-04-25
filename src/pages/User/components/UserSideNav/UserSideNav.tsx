@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import path from "src/constants/path";
 import { AppContext } from "src/contexts/app.context";
+import { getAvatarUrl } from "src/utils/utils";
 
 export default function UserSideNav() {
   const { profile } = useContext(AppContext);
@@ -13,7 +14,7 @@ export default function UserSideNav() {
           className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-black/10"
         >
           <img
-            src={profile?.avatar}
+            src={getAvatarUrl(profile?.avatar)}
             alt="avatar"
             className="h-full w-full rounded-full object-cover"
           ></img>

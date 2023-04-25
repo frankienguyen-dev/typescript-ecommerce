@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import userApi from "src/apis/user.api";
 import Input from "src/components/Input";
@@ -10,11 +10,17 @@ import DateSelect from "../User/components/DateSelect";
 import { toast } from "react-toastify";
 import { AppContext, AppProvider } from "src/contexts/app.context";
 import { setProfileToLocalStorage } from "src/utils/auth";
+import { axiosUnprocessableEntityError, getAvatarUrl } from "src/utils/utils";
+import { ErrorResponse } from "src/types/utils.type";
 
 type FormData = Pick<
   UserSchema,
   "address" | "avatar" | "date_of_birth" | "name" | "phone"
 >;
+
+type FormDataError = Omit<FormData, "date_of_birth"> & {
+  date_of_birth?: string;
+};
 
 const profileSchema = userSchema.pick([
   "name",
@@ -26,6 +32,14 @@ const profileSchema = userSchema.pick([
 
 export default function Profile() {
   const { setProfile } = useContext(AppContext);
+
+  const [file, setFile] = useState<File>();
+
+  const previewImage = useMemo(() => {
+    return file ? URL.createObjectURL(file) : "";
+  }, [file]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -46,7 +60,10 @@ export default function Profile() {
     resolver: yupResolver(profileSchema),
   });
 
+  const avatar = watch("avatar");
+
   const updateProfileMutation = useMutation(userApi.updateProfile);
+  const uploadAvatarMutation = useMutation(userApi.uploadAvatar);
 
   const { data: profileData, refetch } = useQuery({
     queryKey: ["profiles"],
@@ -71,16 +88,47 @@ export default function Profile() {
   }, [profile, setValue]);
 
   const onSubmit = handleSubmit(async (data) => {
-    console.log("check data: ", data);
-    const res = await updateProfileMutation.mutateAsync({
-      ...data,
-      date_of_birth: data.date_of_birth?.toISOString(),
-    });
-    setProfile(res.data.data);
-    setProfileToLocalStorage(res.data.data);
-    refetch();
-    toast.success(res.data.message, { autoClose: 1000 });
+    try {
+      let avatarName = avatar;
+      if (file) {
+        const form = new FormData();
+        form.append("image", file);
+        const uploadResponse = await uploadAvatarMutation.mutateAsync(form);
+        avatarName = uploadResponse.data.data;
+        setValue("avatar", avatarName);
+      }
+      const res = await updateProfileMutation.mutateAsync({
+        ...data,
+        date_of_birth: data.date_of_birth?.toISOString(),
+        avatar: avatarName,
+      });
+      setProfile(res.data.data);
+      setProfileToLocalStorage(res.data.data);
+      refetch();
+      toast.success(res.data.message, { autoClose: 1000 });
+    } catch (error) {
+      if (axiosUnprocessableEntityError<ErrorResponse<FormDataError>>(error)) {
+        const formError = error.response?.data.data;
+        if (formError) {
+          Object.keys(formError).forEach((key) => {
+            setError(key as keyof FormDataError, {
+              message: formError[key as keyof FormDataError],
+              type: "Server",
+            });
+          });
+        }
+      }
+    }
   });
+
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileFromLocal = event.target.files?.[0];
+    setFile(fileFromLocal);
+  };
+
+  const handleUpload = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <div className="rounded-sm bg-white px-4 pb-10 shadow md:px-7 md:pb-20">
@@ -190,16 +238,23 @@ export default function Profile() {
           <div className="mb-6 flex flex-col items-center md:mb-0">
             <div className="my-5 h-24 w-24">
               <img
-                src="https://cf.shopee.vn/file/sg-11134004-23030-h944s18hilovdf_tn"
+                src={previewImage || getAvatarUrl(profile?.avatar)}
                 alt="avatar"
                 className="h-full w-full rounded-full object-cover"
               />
             </div>
-            <input className="hidden" type="file" accept=".jpg,.jpeg,.png" />
+            <input
+              className="hidden"
+              type="file"
+              accept=".jpg,.jpeg,.png"
+              ref={fileInputRef}
+              onChange={onFileChange}
+            />
             <button
               className="flex h-10 items-center justify-end rounded-sm border 
             bg-white px-6 text-sm text-gray-600 shadow-sm"
               type="button"
+              onClick={handleUpload}
             >
               Chọn Ảnh
             </button>
