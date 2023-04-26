@@ -1,7 +1,19 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  Controller,
+  FormProvider,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
 import userApi from "src/apis/user.api";
 import Input from "src/components/Input";
 import InputNumber from "src/components/InputNumber";
@@ -13,6 +25,55 @@ import { setProfileToLocalStorage } from "src/utils/auth";
 import { axiosUnprocessableEntityError, getAvatarUrl } from "src/utils/utils";
 import { ErrorResponse } from "src/types/utils.type";
 import InputFile from "src/components/InputFile";
+
+function Info() {
+  const {
+    register,
+    formState: { errors },
+    control,
+  } = useFormContext<FormData>();
+  return (
+    <Fragment>
+      <div className=" mt-6 flex flex-col flex-wrap sm:flex-row">
+        <div className="w-full truncate pt-3 capitalize sm:w-[20%] sm:text-right">
+          Tên:
+        </div>
+        <div className="mt-3 w-full sm:mt-0 sm:w-[80%] sm:pl-5">
+          <Input
+            classNameInput="w-full rounded-sm border-[1px] border-gray-300 
+              px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm"
+            placeholder="Tên"
+            name="name"
+            register={register}
+            errorMessage={errors.name?.message}
+          />
+        </div>
+      </div>
+
+      <div className=" mt-2 flex flex-col flex-wrap sm:flex-row">
+        <div className="truncate pt-3 capitalize sm:w-[20%] sm:text-right">
+          Số điện thoại:
+        </div>
+        <div className="mt-3 w-full sm:mt-0 sm:w-[80%] sm:pl-5">
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field }) => (
+              <InputNumber
+                classNameInput="w-full rounded-sm border-[1px] border-gray-300 
+              px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm"
+                placeholder="Số điện thoại"
+                errorMessage={errors.phone?.message}
+                {...field}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </div>
+      </div>
+    </Fragment>
+  );
+}
 
 type FormData = Pick<
   UserSchema,
@@ -42,15 +103,7 @@ export default function Profile() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    control,
-    formState: { errors },
-    watch,
-    setError,
-  } = useForm<FormData>({
+  const methods = useForm<FormData>({
     defaultValues: {
       name: "",
       phone: "",
@@ -60,6 +113,16 @@ export default function Profile() {
     },
     resolver: yupResolver(profileSchema),
   });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    formState: { errors },
+    watch,
+    setError,
+  } = methods;
 
   const avatar = watch("avatar");
 
@@ -137,117 +200,83 @@ export default function Profile() {
         </div>
       </div>
 
-      <form
-        className="mt-8 flex flex-col-reverse md:flex-row md:items-start"
-        onSubmit={onSubmit}
-      >
-        <div className="mt-6 flex-grow md:mt-0 md:pr-12">
-          <div className=" flex flex-wrap ">
-            <div className="truncate pr-5 pt-3 capitalize sm:w-[20%] sm:pr-0 sm:text-right">
-              Email:
+      <FormProvider {...methods}>
+        <form
+          className="mt-8 flex flex-col-reverse md:flex-row md:items-start"
+          onSubmit={onSubmit}
+        >
+          <div className="mt-6 flex-grow md:mt-0 md:pr-12">
+            <div className=" flex flex-wrap ">
+              <div className="truncate pr-5 pt-3 capitalize sm:w-[20%] sm:pr-0 sm:text-right">
+                Email:
+              </div>
+              <div className="w-[80%] sm:pl-5">
+                <div className="pt-3 text-gray-700">{profile?.email}</div>
+              </div>
             </div>
-            <div className="w-[80%] sm:pl-5">
-              <div className="pt-3 text-gray-700">{profile?.email}</div>
-            </div>
-          </div>
 
-          <div className=" mt-6 flex flex-col flex-wrap sm:flex-row">
-            <div className="w-full truncate pt-3 capitalize sm:w-[20%] sm:text-right">
-              Tên:
-            </div>
-            <div className="mt-3 w-full sm:mt-0 sm:w-[80%] sm:pl-5">
-              <Input
-                classNameInput="w-full rounded-sm border-[1px] border-gray-300 
+            <Info />
+
+            <div className=" mt-2 flex flex-col flex-wrap sm:flex-row">
+              <div className="w-full truncate pt-3 capitalize sm:w-[20%] sm:text-right">
+                Địa chỉ:
+              </div>
+              <div className="mt-3 w-full sm:mt-0 sm:w-[80%] sm:pl-5">
+                <Input
+                  classNameInput="w-full rounded-sm border-[1px] border-gray-300 
               px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm"
-                placeholder="Tên"
-                name="name"
-                register={register}
-                errorMessage={errors.name?.message}
-              />
+                  placeholder="Địa chỉ"
+                  name="address"
+                  register={register}
+                  errorMessage={errors.address?.message}
+                />
+              </div>
             </div>
-          </div>
+            <Controller
+              control={control}
+              name="date_of_birth"
+              render={({ field }) => (
+                <DateSelect
+                  errorMessage={errors.date_of_birth?.message}
+                  onChange={field.onChange}
+                  value={field.value}
+                />
+              )}
+            />
 
-          <div className=" mt-2 flex flex-col flex-wrap sm:flex-row">
-            <div className="truncate pt-3 capitalize sm:w-[20%] sm:text-right">
-              Số điện thoại:
-            </div>
-            <div className="mt-3 w-full sm:mt-0 sm:w-[80%] sm:pl-5">
-              <Controller
-                control={control}
-                name="phone"
-                render={({ field }) => (
-                  <InputNumber
-                    classNameInput="w-full rounded-sm border-[1px] border-gray-300 
-              px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm"
-                    placeholder="Số điện thoại"
-                    errorMessage={errors.phone?.message}
-                    {...field}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          <div className=" mt-2 flex flex-col flex-wrap sm:flex-row">
-            <div className="w-full truncate pt-3 capitalize sm:w-[20%] sm:text-right">
-              Địa chỉ:
-            </div>
-            <div className="mt-3 w-full sm:mt-0 sm:w-[80%] sm:pl-5">
-              <Input
-                classNameInput="w-full rounded-sm border-[1px] border-gray-300 
-              px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm"
-                placeholder="Địa chỉ"
-                name="address"
-                register={register}
-                errorMessage={errors.address?.message}
-              />
-            </div>
-          </div>
-          <Controller
-            control={control}
-            name="date_of_birth"
-            render={({ field }) => (
-              <DateSelect
-                errorMessage={errors.date_of_birth?.message}
-                onChange={field.onChange}
-                value={field.value}
-              />
-            )}
-          />
-
-          <div className=" mt-2 flex flex-col flex-wrap md:flex-row">
-            <div className="w-full truncate pt-3 capitalize sm:w-[20%] sm:text-right" />
-            <div className="mt-3 flex w-full md:mt-0 md:w-[80%] md:justify-center md:pl-5">
-              <button
-                className="mt-3 flex h-12 w-full items-center justify-center rounded-sm 
+            <div className=" mt-2 flex flex-col flex-wrap md:flex-row">
+              <div className="w-full truncate pt-3 capitalize sm:w-[20%] sm:text-right" />
+              <div className="mt-3 flex w-full md:mt-0 md:w-[80%] md:justify-center md:pl-5">
+                <button
+                  className="mt-3 flex h-12 w-full items-center justify-center rounded-sm 
                 bg-orange px-5 capitalize text-white shadow-sm outline-none hover:bg-orange/90 md:w-[150px] "
-                type="submit"
-              >
-                Lưu
-              </button>
+                  type="submit"
+                >
+                  Lưu
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex justify-center md:w-72 md:items-center md:border-l  md:border-l-gray-300 md:py-8">
-          <div className="mb-6 flex flex-col items-center md:mb-0">
-            <div className="my-5 h-24 w-24">
-              <img
-                src={previewImage || getAvatarUrl(profile?.avatar)}
-                alt="avatar"
-                className="h-full w-full rounded-full object-cover"
-              />
-            </div>
-            <InputFile onChange={handleChangeFile} />
+          <div className="flex justify-center md:w-72 md:items-center md:border-l  md:border-l-gray-300 md:py-8">
+            <div className="mb-6 flex flex-col items-center md:mb-0">
+              <div className="my-5 h-24 w-24">
+                <img
+                  src={previewImage || getAvatarUrl(profile?.avatar)}
+                  alt="avatar"
+                  className="h-full w-full rounded-full object-cover"
+                />
+              </div>
+              <InputFile onChange={handleChangeFile} />
 
-            <div className="mt-3 text-gray-400">
-              <div>Dụng lượng file tối đa 1 MB</div>
-              <div>Định dạng:.JPEG, .PNG</div>
+              <div className="mt-3 text-gray-400">
+                <div>Dụng lượng file tối đa 1 MB</div>
+                <div>Định dạng:.JPEG, .PNG</div>
+              </div>
             </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </FormProvider>
     </div>
   );
 }
