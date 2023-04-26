@@ -30,10 +30,11 @@ export default function Input({
   };
 
   const handleType = () => {
-    if (isShowPassword) {
-      return "text";
+    if (rest.type === "password") {
+      if (isShowPassword) return "text";
+      else return "password";
     }
-    return "password";
+    return rest.type
   };
 
   return (
@@ -45,7 +46,7 @@ export default function Input({
         type={handleType()}
       />
 
-      {isShowPassword ? (
+      {isShowPassword && rest.type === "text" && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -66,7 +67,9 @@ export default function Input({
             d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
           />
         </svg>
-      ) : (
+      )}
+
+      {!isShowPassword && rest.type === "password" && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
