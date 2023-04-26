@@ -71,6 +71,15 @@ function testPriceMinMax(this: yup.TestContext<yup.AnyObject>) {
   return price_min !== "" || price_max !== "";
 }
 
+const handleConfirmPasswordYup = (refString: string) => {
+  return yup
+    .string()
+    .required("Vui lòng nhập lại password")
+    .max(150, "Độ dài email từ 5 đến 160 ký tự")
+    .min(5, "Độ dài email từ 5 đến 160 ký tự")
+    .oneOf([yup.ref(refString)], "Password không trùng khớp");
+};
+
 export const schema = yup.object({
   email: yup
     .string()
@@ -83,12 +92,7 @@ export const schema = yup.object({
     .required("Vui lòng nhập password")
     .max(160, "Độ dài password từ 6 đến 160 ký tự")
     .min(6, "Độ dài password từ 6 đến 160 ký tự"),
-  password_confirm: yup
-    .string()
-    .required("Vui lòng nhập lại password")
-    .max(150, "Độ dài email từ 5 đến 160 ký tự")
-    .min(5, "Độ dài email từ 5 đến 160 ký tự")
-    .oneOf([yup.ref("password")], "Password không trùng khớp"),
+  password_confirm: handleConfirmPasswordYup("password"),
   price_min: yup.string().test({
     name: "price-not-allowed",
     message: "Giá không phù hợp",
@@ -108,9 +112,11 @@ export const userSchema = yup.object({
   address: yup.string().max(160, "Độ dài tối đa là 160 kí tự"),
   avatar: yup.string().max(1000, "Độ dài tối đa là 1000 kí tự"),
   date_of_birth: yup.date().max(new Date(), "Hãy chọn 1 ngày trong quá khứ"),
-  password: schema.fields["password"],
-  new_password: schema.fields["password"],
-  password_confirm: schema.fields["password_confirm"],
+  password: schema.fields["password"] as yup.StringSchema<string | undefined>,
+  new_password: schema.fields["password"] as yup.StringSchema<
+    string | undefined
+  >,
+  password_confirm: handleConfirmPasswordYup("password_confirm"),
 });
 
 export type UserSchema = yup.InferType<typeof userSchema>;
