@@ -24,7 +24,7 @@ import path from "src/constants/path";
 
 export default function ProductDetail() {
   const [buyCount, setBuyCount] = useState(1);
-  const { nameId } = useParams();
+  const { nameId, productId } = useParams();
   const id = getIdFromNameId(nameId as string);
   const queryClient = useQueryClient();
 
