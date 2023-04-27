@@ -7,6 +7,7 @@ import MainLayout from "src/layouts/MainLayout";
 import RegisterLayout from "src/layouts/RegisterLayout";
 import Cart from "src/pages/Cart";
 import Login from "src/pages/Login";
+import NotFound from "src/pages/NotFound";
 import ProductDetail from "src/pages/ProductDetail";
 import ProductList from "src/pages/ProductList";
 import Profile from "src/pages/Profile";
@@ -104,6 +105,14 @@ export default function useRouteElement() {
       element: (
         <MainLayout>
           <ProductDetail />
+        </MainLayout>
+      ),
+    },
+    {
+      path: "*",
+      element: (
+        <MainLayout>
+          <NotFound />
         </MainLayout>
       ),
     },
