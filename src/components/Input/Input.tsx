@@ -70,7 +70,7 @@ export default function Input({
       )}
 
       {!isShowPassword && rest.type === "password" && (
-        <svg
+      <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
