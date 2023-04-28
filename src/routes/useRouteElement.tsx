@@ -1,20 +1,35 @@
-import React, { useContext } from "react";
+import React, { useContext, lazy, Suspense } from "react";
 import { useRoutes, Outlet, Navigate } from "react-router-dom";
 import path from "src/constants/path";
 import { AppContext } from "src/contexts/app.context";
 import CartLayout from "src/layouts/CartLayout";
 import MainLayout from "src/layouts/MainLayout";
 import RegisterLayout from "src/layouts/RegisterLayout";
-import Cart from "src/pages/Cart";
-import Login from "src/pages/Login";
-import NotFound from "src/pages/NotFound";
-import ProductDetail from "src/pages/ProductDetail";
-import ProductList from "src/pages/ProductList";
-import Profile from "src/pages/Profile";
-import Register from "src/pages/Register";
+// import Cart from "src/pages/Cart";
+// import Login from "src/pages/Login";
+// import NotFound from "src/pages/NotFound";
+// import ProductDetail from "src/pages/ProductDetail";
+// import ProductList from "src/pages/ProductList";
+// import Profile from "src/pages/Profile";
+// import Register from "src/pages/Register";
 import UserLayout from "src/pages/User/layouts/UserLayout";
-import ChangePassword from "src/pages/User/pages/ChangePassword";
-import HistoryPurchase from "src/pages/User/pages/HistoryPurchase";
+// import ChangePassword from "src/pages/User/pages/ChangePassword";
+// import HistoryPurchase from "src/pages/User/pages/HistoryPurchase";
+
+// Lazy load
+const Login = lazy(() => import("src/pages/Login"));
+const NotFound = lazy(() => import("src/pages/NotFound"));
+const ProductDetail = lazy(() => import("src/pages/ProductDetail"));
+const ProductList = lazy(() => import("src/pages/ProductList"));
+const Profile = lazy(() => import("src/pages/Profile"));
+const Register = lazy(() => import("src/pages/Register"));
+const Cart = lazy(() => import("src/pages/Cart"));
+const ChangePassword = lazy(
+  () => import("src/pages/User/pages/ChangePassword")
+);
+const HistoryPurchase = lazy(
+  () => import("src/pages/User/pages/HistoryPurchase")
+);
 
 function ProtectedRoute() {
   const { isAuthenticated } = useContext(AppContext);
@@ -36,7 +51,9 @@ export default function useRouteElement() {
           path: path.cart,
           element: (
             <CartLayout>
-              <Cart />
+              <Suspense>
+                <Cart />
+              </Suspense>
             </CartLayout>
           ),
         },
@@ -45,23 +62,37 @@ export default function useRouteElement() {
           path: path.user,
           element: (
             <MainLayout>
-              <UserLayout />
+              <Suspense>
+                <UserLayout />
+              </Suspense>
             </MainLayout>
           ),
           children: [
             {
               path: path.profile,
-              element: <Profile />,
+              element: (
+                <Suspense>
+                  <Profile />
+                </Suspense>
+              ),
             },
 
             {
               path: path.changePassword,
-              element: <ChangePassword />,
+              element: (
+                <Suspense>
+                  <ChangePassword />
+                </Suspense>
+              ),
             },
 
             {
               path: path.historyPurchase,
-              element: <HistoryPurchase />,
+              element: (
+                <Suspense>
+                  <HistoryPurchase />
+                </Suspense>
+              ),
             },
           ],
         },
@@ -76,7 +107,9 @@ export default function useRouteElement() {
           path: path.login,
           element: (
             <RegisterLayout>
-              <Login />
+              <Suspense>
+                <Login />
+              </Suspense>
             </RegisterLayout>
           ),
         },
@@ -85,7 +118,9 @@ export default function useRouteElement() {
           path: path.register,
           element: (
             <RegisterLayout>
-              <Register />
+              <Suspense>
+                <Register />
+              </Suspense>
             </RegisterLayout>
           ),
         },
@@ -96,7 +131,9 @@ export default function useRouteElement() {
       index: true,
       element: (
         <MainLayout>
-          <ProductList />
+          <Suspense>
+            <ProductList />
+          </Suspense>
         </MainLayout>
       ),
     },
@@ -104,7 +141,9 @@ export default function useRouteElement() {
       path: path.productDetail,
       element: (
         <MainLayout>
-          <ProductDetail />
+          <Suspense>
+            <ProductDetail />
+          </Suspense>
         </MainLayout>
       ),
     },
@@ -112,7 +151,9 @@ export default function useRouteElement() {
       path: "*",
       element: (
         <MainLayout>
-          <NotFound />
+          <Suspense>
+            <NotFound />
+          </Suspense>
         </MainLayout>
       ),
     },
