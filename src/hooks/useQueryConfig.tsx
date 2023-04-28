@@ -1,18 +1,19 @@
-import React from 'react'
-import { productListConfig } from 'src/types/product.type'
-import useQueryParams from './useQueryParams'
-import { omitBy, isUndefined } from 'lodash'
+import React from "react";
+import { productListConfig } from "src/types/product.type";
+import useQueryParams from "./useQueryParams";
+import omitBy from "lodash/omitBy";
+import isUndefined from "lodash/isUndefined";
 
 export type QueryConfig = {
-  [key in keyof productListConfig]: string
-}
+  [key in keyof productListConfig]: string;
+};
 
 export default function useQueryConfig() {
-  const queryParams: QueryConfig = useQueryParams()
+  const queryParams: QueryConfig = useQueryParams();
 
   const queryConfig: QueryConfig = omitBy(
     {
-      page: queryParams.page || '1',
+      page: queryParams.page || "1",
       limit: queryParams.limit || 10,
       exclude: queryParams.exclude,
       name: queryParams.name,
@@ -21,9 +22,9 @@ export default function useQueryConfig() {
       price_min: queryParams.price_min,
       rating_filter: queryParams.rating_filter,
       sort_by: queryParams.sort_by,
-      category: queryParams.category
+      category: queryParams.category,
     },
     isUndefined
-  )
-  return queryConfig
+  );
+  return queryConfig;
 }
