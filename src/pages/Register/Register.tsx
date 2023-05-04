@@ -1,22 +1,21 @@
-import React, { useContext } from "react";
-import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import Input from "src/components/Input";
-import { schema, Schema } from "src/utils/rules";
-import * as yup from "yup";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
+
+import { schema, Schema } from "src/utils/rules";
+import Input from "src/components/Input";
 import authApi from "src/apis/auth.api";
-import omit from "lodash/omit";
-import { isAxiosError } from "axios";
 import { axiosUnprocessableEntityError } from "src/utils/utils";
-import { ServerResponse } from "http";
 import { ErrorResponse } from "src/types/utils.type";
+import { useContext } from "react";
 import { AppContext } from "src/contexts/app.context";
 import Button from "src/components/Button";
+import { omit, Omit } from "lodash";
+import { string } from "yup";
 import path from "src/constants/path";
 
-type formData = Pick<Schema, "email" | "password" | "password_confirm">;
+type FormData = Pick<Schema, "email" | "password" | "password_confirm">;
 const registerSchema = schema.pick(["password", "email", "password_confirm"]);
 
 export default function Register() {
@@ -29,13 +28,13 @@ export default function Register() {
     register,
     setError,
     formState: { errors },
-  } = useForm<formData>({
+  } = useForm<FormData>({
     resolver: yupResolver(registerSchema),
   });
 
   const registerAccountMutation = useMutation({
-    mutationFn: (body: Omit<formData, "password_confirm">) =>
-      authApi.registerAccount(body),
+    mutationFn: (body: Omit<FormData, "confirm_password">) =>
+      authApi.registerAccount(body as { email: string; password: string }),
   });
 
   const onSubmit = handleSubmit((data) => {
@@ -50,15 +49,15 @@ export default function Register() {
       onError: (error) => {
         if (
           axiosUnprocessableEntityError<
-            ErrorResponse<Omit<formData, "password_confirm">>
+            ErrorResponse<Omit<FormData, "password_confirm">>
           >(error)
         ) {
           const formError = error.response?.data.data;
           if (formError) {
             Object.keys(formError).forEach((key) => {
-              setError(key as keyof Omit<formData, "password_confirm">, {
+              setError(key as keyof Omit<FormData, "password_confirm">, {
                 message:
-                  formError[key as keyof Omit<formData, "password_confirm">],
+                  formError[key as keyof Omit<FormData, "password_confirm">],
                 type: "Server",
               });
             });
@@ -108,6 +107,7 @@ export default function Register() {
                 placeholder="Password"
                 name="password"
                 register={register}
+                classNameEye="absolute right-[7px] top-[12px] h-5 w-5 cursor-pointer"
                 errorMessage={errors.password?.message}
                 autoComplete="on"
               />
@@ -117,6 +117,7 @@ export default function Register() {
                 type="password"
                 placeholder="Confirm Password"
                 name="password_confirm"
+                classNameEye="absolute right-[7px] top-[12px] h-5 w-5 cursor-pointer"
                 register={register}
                 errorMessage={errors.password_confirm?.message}
                 autoComplete="on"

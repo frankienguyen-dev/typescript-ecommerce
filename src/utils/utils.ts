@@ -3,6 +3,7 @@ import config from "src/constants/config";
 import HttpStatusCode from "src/constants/httpStatusCode.enum";
 import { string } from "yup";
 import userImage from "/src/images/avatar/user.png";
+import { ErrorResponse } from "src/types/utils.type";
 
 export function isAxiosError<T>(error: unknown): error is AxiosError<T> {
   // eslint-disable-next-line import/no-named-as-default-member
@@ -15,6 +16,25 @@ export function axiosUnprocessableEntityError<FormError>(
   return (
     isAxiosError(error) &&
     error.response?.status === HttpStatusCode.UnprocessableEntity
+  );
+}
+
+export function axiosUnauthorizedError<UnauthorizedError>(
+  error: unknown
+): error is AxiosError<UnauthorizedError> {
+  return (
+    isAxiosError(error) &&
+    error.response?.status === HttpStatusCode.Unauthorized
+  );
+}
+
+export function axiosExpiredTokenError<UnauthorizedError>(
+  error: unknown
+): error is AxiosError<UnauthorizedError> {
+  return (
+    axiosUnauthorizedError<ErrorResponse<{ name: string; message: string }>>(
+      error
+    ) && error.response.data.data.name === "EXPIRED_TOKEN"
   );
 }
 

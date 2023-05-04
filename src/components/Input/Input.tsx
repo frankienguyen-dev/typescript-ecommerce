@@ -34,11 +34,11 @@ export default function Input({
       if (isShowPassword) return "text";
       else return "password";
     }
-    return rest.type
+    return rest.type;
   };
 
   return (
-    <div className={className}>
+    <div className={"relative " + className}>
       <input
         {...registerResult}
         className={classNameInput}
@@ -46,7 +46,7 @@ export default function Input({
         type={handleType()}
       />
 
-      {isShowPassword && rest.type === "text" && (
+      {isShowPassword && rest.type === "password" && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -70,7 +70,7 @@ export default function Input({
       )}
 
       {!isShowPassword && rest.type === "password" && (
-      <svg
+        <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
